@@ -31,13 +31,13 @@ extension KolodaView {
 
         //Reconfigure drag animation constants from Koloda instance.
         if let rotationMax = self.rotationMax {
-            card.rotationMax = rotationMax
+            card.rotationMax =  CGFloat(rotationMax.doubleValue)
         }
         if let rotationAngle = self.rotationAngle {
-            card.rotationAngle = rotationAngle
+            card.rotationAngle =  CGFloat(rotationAngle.doubleValue)
         }
         if let scaleMin = self.scaleMin {
-            card.scaleMin = scaleMin
+            card.scaleMin =  CGFloat(scaleMin.doubleValue)
         }
     }
     

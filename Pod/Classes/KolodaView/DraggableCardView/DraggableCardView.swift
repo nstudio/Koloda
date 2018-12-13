@@ -9,22 +9,22 @@
 import UIKit
 import pop
 
-public enum DragSpeed: TimeInterval {
-    case slow = 2.0
-    case moderate = 1.5
-    case `default` = 0.8
-    case fast = 0.4
+@objc public enum DragSpeed: Int {
+    case slow// = 2.0
+    case moderate// = 1.5
+    case standard//`default`// = 0.8
+    case fast// = 0.4
 }
 
-protocol DraggableCardDelegate: class {
+@objc public protocol DraggableCardDelegate: class {
     
     func card(_ card: DraggableCardView, wasDraggedWithFinishPercentage percentage: CGFloat, inDirection direction: SwipeResultDirection)
     func card(_ card: DraggableCardView, wasSwipedIn direction: SwipeResultDirection)
     func card(_ card: DraggableCardView, shouldSwipeIn direction: SwipeResultDirection) -> Bool
     func card(cardWasReset card: DraggableCardView)
     func card(cardWasTapped card: DraggableCardView)
-    func card(cardSwipeThresholdRatioMargin card: DraggableCardView) -> CGFloat?
-    func card(cardAllowedDirections card: DraggableCardView) -> [SwipeResultDirection]
+    func card(cardSwipeThresholdRatioMargin card: DraggableCardView) -> NSNumber?
+    func card(cardAllowedDirections card: DraggableCardView) -> Array<Int>
     func card(cardShouldDrag card: DraggableCardView) -> Bool
     func card(cardSwipeSpeed card: DraggableCardView) -> DragSpeed
     func card(cardPanBegan card: DraggableCardView)
@@ -43,7 +43,8 @@ private let cardResetAnimationSpringBounciness: CGFloat = 10.0
 private let cardResetAnimationSpringSpeed: CGFloat = 20.0
 private let cardResetAnimationKey = "resetPositionAnimation"
 private let cardResetAnimationDuration: TimeInterval = 0.2
-internal var cardSwipeActionAnimationDuration: TimeInterval = DragSpeed.default.rawValue
+// internal var cardSwipeActionAnimationDuration: TimeInterval = DragSpeed.default.rawValue
+internal var cardSwipeActionAnimationDuration: TimeInterval = 0.8
 
 public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
 
@@ -88,7 +89,7 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
     override public var frame: CGRect {
         didSet {
             if let ratio = delegate?.card(cardSwipeThresholdRatioMargin: self) , ratio != 0 {
-                swipePercentageMargin = ratio
+                swipePercentageMargin =  CGFloat(ratio.doubleValue)
             } else {
                 swipePercentageMargin = 1.0
             }
@@ -109,9 +110,9 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
         tapGestureRecognizer.cancelsTouchesInView = false
         addGestureRecognizer(tapGestureRecognizer)
 
-        if let delegate = delegate {
-            cardSwipeActionAnimationDuration = delegate.card(cardSwipeSpeed: self).rawValue
-        }
+        // if let delegate = delegate {
+        //     cardSwipeActionAnimationDuration = delegate.card(cardSwipeSpeed: self).rawValue
+        // }
     }
     
     //MARK: Configurations
@@ -215,9 +216,9 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
     }
     
     func configureSwipeSpeed() {
-        if let delegate = delegate {
-            cardSwipeActionAnimationDuration = delegate.card(cardSwipeSpeed: self).rawValue
-        }
+        // if let delegate = delegate {
+        //     cardSwipeActionAnimationDuration = delegate.card(cardSwipeSpeed: self).rawValue
+        // }
     }
     
     //MARK: GestureRecognizers
@@ -289,20 +290,21 @@ public class DraggableCardView: UIView, UIGestureRecognizerDelegate {
     
     //MARK: Private
     
-    private var directions: [SwipeResultDirection] {
-        return delegate?.card(cardAllowedDirections: self) ?? [.left, .right]
+    private var directions: Array<Int> {
+        return delegate?.card(cardAllowedDirections: self) ?? [0, 1]
     }
     
     private var dragDirection: SwipeResultDirection? {
         //find closest direction
         let normalizedDragPoint = dragDistance.normalizedDistanceForSize(bounds.size)
-        return directions.reduce((distance:CGFloat.infinity, direction:nil)) { closest, direction in
-            let distance = direction.point.distanceTo(normalizedDragPoint)
-            if distance < closest.distance {
-                return (distance, direction)
-            }
-            return closest
-        }.direction
+        return SwipeResultDirection.left;
+        // return directions.reduce((distance:CGFloat.infinity, direction:nil)) { closest, direction in
+        //     let distance = direction.point.distanceTo(normalizedDragPoint)
+        //     if distance < closest.distance {
+        //         return (distance, direction)
+        //     }
+        //     return closest
+        // }.direction
     }
     
     private var dragPercentage: CGFloat {

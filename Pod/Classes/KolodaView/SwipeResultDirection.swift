@@ -8,8 +8,9 @@
 
 import Foundation
 import CoreGraphics
+import CoreMotion
 
-public enum SwipeResultDirection: String {
+@objc public enum SwipeResultDirection: Int {
     
     case left
     case right
@@ -23,7 +24,7 @@ public enum SwipeResultDirection: String {
 
 extension SwipeResultDirection {
     
-    private var swipeDirection: Direction {
+    public var swipeDirection: Direction {
         switch self {
         case .up: return .up
         case .down: return .down
@@ -36,60 +37,71 @@ extension SwipeResultDirection {
         }
     }
     
-    var point: CGPoint {
+    public var point: CGPoint {
         return self.swipeDirection.point
     }
     
-    var bearing: Double {
+    public var bearing: Double {
         return self.swipeDirection.bearing
     }
     
-    static var boundsRect: CGRect {
-        let w = HorizontalPosition.right.rawValue - HorizontalPosition.left.rawValue
-        let h = VerticalPosition.bottom.rawValue - VerticalPosition.top.rawValue
-        return CGRect(x: HorizontalPosition.left.rawValue, y: VerticalPosition.top.rawValue, width: w, height: h)
+    public static var boundsRect: CGRect {
+        // let w = HorizontalPosition.right.rawValue - HorizontalPosition.left.rawValue
+        // let h = VerticalPosition.bottom.rawValue - VerticalPosition.top.rawValue
+        // return CGRect(x: HorizontalPosition.left.rawValue, y: VerticalPosition.top.rawValue, width: w, height: h)
+        let w = 1 - -1
+        let h = 1 - -1
+        return CGRect(x: -1, y: -1, width: w, height: h)
     }
 }
 
 
-private enum VerticalPosition: CGFloat {
+// @objc public enum VerticalPosition: Int {
     
-    case top = -1
-    case middle = 0
-    case bottom = 1
-}
+//     case top// = -1
+//     case middle// = 0
+//     case bottom// = 1
+// }
 
-private enum HorizontalPosition: CGFloat {
+// @objc public enum HorizontalPosition: Int {
     
-    case left = -1
-    case middle = 0
-    case right = 1
-}
+//     case left// = -1
+//     case middle// = 0
+//     case right// = 1
+// }
 
 
-private struct Direction {
+@objc public class Direction: NSObject {
     
-    let horizontalPosition:HorizontalPosition
-    let verticalPosition:VerticalPosition
-    
-    var point: CGPoint {
-        return CGPoint(x:horizontalPosition.rawValue, y: verticalPosition.rawValue)
+    let horizontalPosition:Int
+    let verticalPosition:Int
+
+    override public init(horizontalPosition: Int, verticalPosition: Int) {
+      self.init()
+      self.horizontalPosition = horizontalPosition
+      self.verticalPosition = verticalPosition
+      let coreMotionManager = CMMotionManager()
+        coreMotionManager.accelerometerUpdateInterval = 0.1
+    }
+
+    public var point: CGPoint {
+        return CGPoint(x:horizontalPosition, y: verticalPosition)
     }
     
-    var bearing: Double {
+    public var bearing: Double {
         return self.point.bearingTo(Direction.none.point)
     }
     
-    static let none = Direction(horizontalPosition: .middle, verticalPosition: .middle)
-    static let up = Direction(horizontalPosition: .middle, verticalPosition: .top)
-    static let down = Direction(horizontalPosition: .middle, verticalPosition: .bottom)
-    static let left = Direction(horizontalPosition: .left, verticalPosition: .middle)
-    static let right = Direction(horizontalPosition: .right, verticalPosition: .middle)
-    
-    static let topLeft = Direction(horizontalPosition: .left, verticalPosition: .top)
-    static let topRight = Direction(horizontalPosition: .right, verticalPosition: .top)
-    static let bottomLeft = Direction(horizontalPosition: .left, verticalPosition: .bottom)
-    static let bottomRight = Direction(horizontalPosition: .right, verticalPosition: .bottom)
+    public static let none = Direction(horizontalPosition: 0, verticalPosition: 0)
+    public static let up = Direction(horizontalPosition: 0, verticalPosition: -1)
+    public static let down = Direction(horizontalPosition: 0, verticalPosition: 1)
+    public static let left = Direction(horizontalPosition: -1, verticalPosition: 0)
+    public static let right = Direction(horizontalPosition: 1, verticalPosition: 0)
+
+    public static let topLeft = Direction(horizontalPosition: -1, verticalPosition: -1)
+    public static let topRight = Direction(horizontalPosition: 1, verticalPosition: -1)
+    public static let bottomLeft = Direction(horizontalPosition: -1, verticalPosition: 1)
+    public static let bottomRight = Direction(horizontalPosition: 1, verticalPosition: 1)
 }
 
 
